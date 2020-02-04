@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"questions/controller/account"
+	"questions/controller/category"
 	"questions/db"
 	"questions/gen_id"
 	"questions/session"
@@ -35,5 +36,6 @@ func main() {
 	router.Static("/fonts", "./static/fonts")
 	router.POST("/api/user/register", account.RegisterHandle)
 	router.POST("/api/user/login", account.LoginHandle)
+	router.GET("/api/category/list", category.GetCategoryList)
 	_ = router.Run(":9090")
 }
