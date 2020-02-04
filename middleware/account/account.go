@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+
 	"questions/session"
 )
 
@@ -13,15 +14,13 @@ func ProcessRequest(context *gin.Context) {
 	var userSession session.Session
 	defer func() {
 		if userSession == nil {
-			userSession, err := session.CreateSession()
-			if err != nil {
-				fmt.Printf("%v", err)
-			}
+			userSession, _ = session.CreateSession()
+
 		}
 		context.Set(MercurySessionName, userSession)
 	}()
 
-	sessionId, err := context.Cookie(MercurySessionName)
+	sessionId, err := context.Cookie(CookieSessionId)
 	if err != nil {
 		context.Set(MercuryUserLoginStatus, int64(0))
 		context.Set(MercuryUserId, int64(0))
@@ -54,7 +53,7 @@ func ProcessRequest(context *gin.Context) {
 	}
 	context.Set(MercuryUserId, userId)
 	context.Set(MercuryUserLoginStatus, int64(1))
-	return
+
 }
 
 func ProcessReponse(context *gin.Context) {
@@ -69,23 +68,46 @@ func ProcessReponse(context *gin.Context) {
 	if userSession == nil {
 		return
 	}
+
 	// session没有修改
-	if userSession.IsModify() == false {
+	if !userSession.IsModify() {
 		return
 	}
 	err := userSession.Save()
 
 	if err != nil {
+		fmt.Printf("userSession save failed = %v\n", err)
 		return
 	}
 	// reset cookie
 	sessionId := userSession.Id()
 	cookie := &http.Cookie{
-		Name:     MercurySessionName,
+		Name:     CookieSessionId,
 		Value:    sessionId,
 		Path:     "/",
 		MaxAge:   CookieMaxAge,
 		HttpOnly: true,
 	}
 	http.SetCookie(context.Writer, cookie)
+}
+
+// 设置userId到session中
+func SetUserId(context *gin.Context, userId int64) {
+	tempSession, exist := context.Get(MercurySessionName)
+	if !exist {
+		return
+	}
+	session, ok := tempSession.(session.Session)
+	if !ok {
+		return
+	}
+
+	if session == nil {
+		return
+	}
+	err := session.Set(MercuryUserId, userId)
+	if err != nil {
+		fmt.Printf("set data failed:%v\n", err)
+	}
+
 }

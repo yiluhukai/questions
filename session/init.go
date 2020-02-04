@@ -22,7 +22,6 @@ func Init(provider string, addr string, options ...string) (err error) {
 		err = fmt.Errorf("not support")
 		return
 	}
-
 	err = sessionMgr.Init(addr, options...)
 	return
 }

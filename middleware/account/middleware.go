@@ -1,5 +1,1 @@
 package account
-
-func hello() {
-
-}
