@@ -12,6 +12,7 @@ func GetCategoryList(c *gin.Context) {
 	if err != nil {
 		fmt.Printf("fetch categoryList failed,%v", err)
 		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
 	}
 	util.ResponseSuccess(c, categoryList)
 }

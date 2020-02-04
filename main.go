@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"questions/controller/account"
 	"questions/controller/category"
 	"questions/db"
 	"questions/gen_id"
 	"questions/session"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
