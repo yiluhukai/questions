@@ -12,7 +12,7 @@ func TestFilter(t *testing.T) {
 		t.Errorf("load filter data failed, err:%v", err)
 		return
 	}
-	data := `傻逼玩意儿`
+	data := `大卧槽,大傻逼玩意儿`
 	result, hit := Replace(data, "***")
 	fmt.Printf("hit:%#v, str:%v\n", hit, result)
 }

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -110,4 +111,35 @@ func SetUserId(context *gin.Context, userId int64) {
 		fmt.Printf("set data failed:%v\n", err)
 	}
 
+}
+
+// 获取用户的id
+func GetUserId(c *gin.Context) (uid int64, err error) {
+	tempUid, exist := c.Get(MercuryUserId)
+	if !exist {
+		err = errors.New("user id not exists")
+		return
+	}
+	uid, ok := tempUid.(int64)
+	if !ok {
+		err = errors.New("user id not exists")
+		return
+	}
+	if uid == 0 {
+		err = errors.New("user id not exists")
+		return
+	}
+	return
+}
+
+func IsLogin(c *gin.Context) bool {
+	tempStatus, exist := c.Get(MercuryUserLoginStatus)
+	if !exist {
+		return false
+	}
+	status, ok := tempStatus.(int64)
+	if !ok {
+		return false
+	}
+	return status != 0
 }

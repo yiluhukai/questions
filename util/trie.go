@@ -8,7 +8,7 @@ type Node struct {
 	//rune表示一个utf8字符
 	char rune
 	Data interface{}
-	//parent *Node
+	// parent *Node
 	Depth int
 	//childs 用来当前节点的所有孩子节点
 	childs map[rune]*Node

@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"questions/util"
+	"strings"
 )
 
 var (
@@ -20,7 +21,9 @@ func Init(filepath string) (err error) {
 	defer file.Close()
 	reader := bufio.NewReader(file)
 	for {
-		word, errREet := reader.ReadString('\n')
+		line, errREet := reader.ReadString('\n')
+		//去除换行符和空格
+		word := strings.TrimSpace(strings.Replace(line, "\r\n", "", -1))
 		if errREet == io.EOF {
 			break
 		}
