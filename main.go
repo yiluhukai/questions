@@ -52,5 +52,6 @@ func main() {
 	router.POST("/api/user/login", account.LoginHandle)
 	router.GET("/api/category/list", category.GetCategoryList)
 	router.POST("/api/ask/submit", auth_middleware.AuthMiddleWare, question.QuestionSubmitHandle)
+	router.GET("/api/question/list", category.GetQuestionListHandle)
 	_ = router.Run(":9090")
 }

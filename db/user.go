@@ -2,6 +2,9 @@ package db
 
 import (
 	"database/sql"
+	"logger"
+
+	"github.com/jmoiron/sqlx"
 	"questions/model"
 	"questions/util"
 )
@@ -45,6 +48,35 @@ func Login(userInfo *model.UserInfo) (err error) {
 	//由于密码是加密过的，所以这块也要加密
 	if userInfo.Password != util.MD5([]byte(PasswordSalt+password)) {
 		err = ErrUserPasswordWrong
+	}
+	return
+}
+
+func GetUserInfoList(userIdList []int64) (userInfoList []*model.UserInfo, err error) {
+
+	if len(userIdList) == 0 {
+		return
+	}
+	sqlStr := `select
+					user_id, nickname, sex, username, email
+				from
+					user
+				where user_id in(?)`
+	var tempUserIdList []interface{}
+
+	for _, userId := range userIdList {
+		tempUserIdList = append(tempUserIdList, userId)
+	}
+	query, args, err := sqlx.In(sqlStr, tempUserIdList)
+
+	if err != nil {
+		logger.LogError("sql err:%v", err)
+		return
+
+	}
+	err = db.Select(&userInfoList, query, args...)
+	if err != nil {
+		logger.LogError("select userinfo failed :%v", err)
 	}
 	return
 }

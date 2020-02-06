@@ -11,7 +11,7 @@ var db *sqlx.DB
 
 func InitDb() (err error) {
 	// Data Source Name
-	dsn := "root:123456@tcp(127.0.0.1:3306)/question"
+	dsn := "root:123456@tcp(127.0.0.1:3306)/question?parseTime=true"
 	if db, err = sqlx.Open("mysql", dsn); err != nil {
 		return
 	}

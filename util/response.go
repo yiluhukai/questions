@@ -25,6 +25,7 @@ func ResponseError(context *gin.Context, code int) {
 		Message: GetMessage(code),
 	}
 	context.JSON(http.StatusOK, responseData)
+	context.Abort()
 }
 
 func ResponseSuccess(context *gin.Context, data interface{}) {
@@ -33,4 +34,5 @@ func ResponseSuccess(context *gin.Context, data interface{}) {
 		Data: data,
 	}
 	context.JSON(http.StatusOK, responseData)
+	context.Abort()
 }

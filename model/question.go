@@ -16,3 +16,9 @@ type Question struct {
 	QuestionIdStr string    `json:"question_id"`
 	AuthorIdStr   string    `json:"author_id"`
 }
+
+// 获取带有作者姓名的question
+type ApiQuestion struct {
+	Question
+	AuthorName string `json:"author_name"`
+}
