@@ -1,6 +1,7 @@
 package db
 
 import (
+	"logger"
 	"questions/model"
 )
 
@@ -25,5 +26,16 @@ func CreateQuestion(question *model.Question) (err error) {
 func GetQuestionList(category_id int64) (questestionList []*model.Question, err error) {
 	sqlStr := "select question_id,caption,content,author_id,category_id,create_time from question where category_id = ?"
 	err = db.Select(&questestionList, sqlStr, category_id)
+	return
+}
+
+func GetQuestion(question_id int64) (questionDetail *model.Question, err error) {
+	questionDetail = &model.Question{}
+	sqlStr := "select question_id,caption,content,author_id,category_id,create_time from question where question_id = ?"
+	err = db.Get(questionDetail, sqlStr, question_id)
+	if err != nil {
+		logger.LogError("fetch question deatil via question_id  failed:%v", err)
+		return
+	}
 	return
 }

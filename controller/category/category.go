@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-func GetCategoryList(c *gin.Context) {
+func GetCategoryListHandle(c *gin.Context) {
 	categoryList, err := db.GetCategoryList()
 	if err != nil {
 		fmt.Printf("fetch categoryList failed,%v", err)

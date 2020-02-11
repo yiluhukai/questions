@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"logger"
 	"questions/controller/account"
+	"questions/controller/answer"
 	"questions/controller/category"
 	"questions/controller/question"
 	"questions/db"
@@ -37,8 +38,8 @@ func main() {
 		panic(err)
 	}
 	// 初始化Session
-	err = session.Init("redis", "192.168.1.12:6379")
-
+	//err = session.Init("redis", "192.168.1.12:6379")
+	err = session.Init("memory", "")
 	if err != nil {
 		fmt.Printf("init redis error:%v", err)
 		panic(err)
@@ -50,8 +51,10 @@ func main() {
 	router.Static("/fonts", "./static/fonts")
 	router.POST("/api/user/register", account.RegisterHandle)
 	router.POST("/api/user/login", account.LoginHandle)
-	router.GET("/api/category/list", category.GetCategoryList)
+	router.GET("/api/category/list", category.GetCategoryListHandle)
 	router.POST("/api/ask/submit", auth_middleware.AuthMiddleWare, question.QuestionSubmitHandle)
 	router.GET("/api/question/list", category.GetQuestionListHandle)
+	router.GET("/api/question/detail", question.QuestionDetailHandle)
+	router.GET("/api/answer/list", answer.AnswerListHandle)
 	_ = router.Run(":9090")
 }

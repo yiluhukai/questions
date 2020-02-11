@@ -64,3 +64,46 @@ func QuestionSubmitHandle(c *gin.Context) {
 	logger.LogDebug("create question succ, question:%#v", question)
 	util.ResponseSuccess(c, nil)
 }
+
+func QuestionDetailHandle(c *gin.Context) {
+	question_id, err := util.GetQueryInt64(c, "question_id")
+	if err != nil {
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+	//使用问题id获取问题详情
+	questionDetail, err := db.GetQuestion(question_id)
+	if err != nil {
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+	//  通过类别id获取用户的类别信息
+	categoryMap, err := db.GetCategory([]int64{questionDetail.CategoryId})
+
+	if err != nil {
+		logger.LogError("fetch categoryList failed:%v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+	// 获取问题的作者信息
+	userInfoList, err := db.GetUserInfoList([]int64{questionDetail.AuthorId})
+	if err != nil {
+		logger.LogError("fetch userInfoList failed:%v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+
+	category, ok := categoryMap[questionDetail.CategoryId]
+	if !ok {
+		logger.LogError("fetch categoryList failed:%v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+	var question model.ApiQuestionDetail
+	question.CategoryName = category.CategoryName
+	question.Question = *questionDetail
+	for _, userInfo := range userInfoList {
+		question.AuthorName = userInfo.Username
+	}
+	util.ResponseSuccess(c, question)
+}
