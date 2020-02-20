@@ -73,6 +73,10 @@ func QuestionDetailHandle(c *gin.Context) {
 	}
 	//使用问题id获取问题详情
 	questionDetail, err := db.GetQuestion(question_id)
+	if err == db.ErrQuestionNotExist {
+		util.ResponseError(c, util.ErrCodeQuestionNotExist)
+		return
+	}
 	if err != nil {
 		util.ResponseError(c, util.ErrCodeServerBusy)
 		return
@@ -105,5 +109,6 @@ func QuestionDetailHandle(c *gin.Context) {
 	for _, userInfo := range userInfoList {
 		question.AuthorName = userInfo.Username
 	}
+	question.CreateTimeStr = questionDetail.CreateTime.Format("Mon Jan 2 15:04:05 -0700 MST 2006")
 	util.ResponseSuccess(c, question)
 }

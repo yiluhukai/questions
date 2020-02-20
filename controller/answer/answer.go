@@ -2,10 +2,14 @@ package answer
 
 import (
 	"github.com/gin-gonic/gin"
+	"html"
 	"logger"
 	"questions/db"
+	"questions/gen_id"
+	"questions/middleware/account"
 	"questions/model"
 	"questions/util"
+	"strconv"
 )
 
 func AnswerListHandle(c *gin.Context) {
@@ -84,4 +88,65 @@ func AnswerListHandle(c *gin.Context) {
 	}
 	apiAnswerList.TotalCount = int32(answerCount)
 	util.ResponseSuccess(c, apiAnswerList)
+}
+
+func AnswerCommitHandle(c *gin.Context) {
+	var aw model.Answer
+	err := c.BindJSON(&aw)
+	if err != nil {
+		logger.LogError("bind answer failed:err", err)
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+	// 将问题的id转化成int64
+	questionId, err := strconv.ParseInt(aw.QuestionId, 10, 64)
+	if err != nil {
+		logger.LogError("parse question_id to int64 failed:%v", err)
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+
+	// 验证提交的答案
+
+	if len(aw.Content) == 0 {
+		logger.LogError("length of answer's content is zero %v", err)
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+	// 对提交的内容转移，防止xss攻击
+	aw.Content = html.EscapeString(aw.Content)
+
+	// 从session中获取用户的id
+
+	uid, err := account.GetUserId(c)
+
+	if err != nil {
+		logger.LogError("user does not found:%v", err)
+		util.ResponseError(c, util.ErrCodeNotLogin)
+		return
+	}
+	aw.AuthorId = uid
+
+	//生成答案的id
+	answerId, err := gen_id.GetID()
+
+	if err != nil {
+		logger.LogError("create answer_id failed:%v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+
+	aid := int64(answerId)
+
+	aw.AnswerId = aid
+
+	err = db.CreateAnswer(&aw, questionId)
+
+	if err != nil {
+		logger.LogError("save anser failed:%v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+
+	util.ResponseSuccess(c, nil)
 }

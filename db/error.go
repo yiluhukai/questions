@@ -7,4 +7,5 @@ var (
 	ErrUserNotExists     = errors.New("username not exist")
 	ErrUserPasswordWrong = errors.New("username or password not right")
 	ErrRecordExists      = errors.New("record exist")
+	ErrQuestionNotExist  = errors.New("question doesn't exist")
 )

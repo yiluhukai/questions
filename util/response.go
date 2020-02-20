@@ -30,8 +30,9 @@ func ResponseError(context *gin.Context, code int) {
 
 func ResponseSuccess(context *gin.Context, data interface{}) {
 	responseData := ResponseData{
-		Code: ErrCodeSuccess,
-		Data: data,
+		Code:    ErrCodeSuccess,
+		Data:    data,
+		Message: "请求成功",
 	}
 	context.JSON(http.StatusOK, responseData)
 	context.Abort()

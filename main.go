@@ -6,6 +6,7 @@ import (
 	"questions/controller/account"
 	"questions/controller/answer"
 	"questions/controller/category"
+	"questions/controller/comment"
 	"questions/controller/question"
 	"questions/db"
 	"questions/filter"
@@ -56,5 +57,9 @@ func main() {
 	router.GET("/api/question/list", category.GetQuestionListHandle)
 	router.GET("/api/question/detail", question.QuestionDetailHandle)
 	router.GET("/api/answer/list", answer.AnswerListHandle)
+	router.POST("/api/answer/commit", auth_middleware.AuthMiddleWare, answer.AnswerCommitHandle)
+	group := router.Group("/api/comment", auth_middleware.AuthMiddleWare)
+
+	group.POST("/post_comment", comment.PostCommentHandle)
 	_ = router.Run(":9090")
 }

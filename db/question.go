@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"logger"
 	"questions/model"
 )
@@ -33,8 +34,14 @@ func GetQuestion(question_id int64) (questionDetail *model.Question, err error) 
 	questionDetail = &model.Question{}
 	sqlStr := "select question_id,caption,content,author_id,category_id,create_time from question where question_id = ?"
 	err = db.Get(questionDetail, sqlStr, question_id)
+
+	if err == sql.ErrNoRows {
+		logger.LogDebug("question doesn't exist:%v", err)
+		err = ErrQuestionNotExist
+		return
+	}
 	if err != nil {
-		logger.LogError("fetch question deatil via question_id  failed:%v", err)
+		logger.LogError("fetch question deatil via question_id %v failed:%v", question_id, err)
 		return
 	}
 	return

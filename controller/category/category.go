@@ -39,18 +39,19 @@ func GetQuestionListHandle(c *gin.Context) {
 	// 通过id获取questions
 
 	questionList, err := db.GetQuestionList(categoryId)
+
 	if err != nil {
 		logger.LogError("get questionList by id failed :%v", err)
 		util.ResponseError(c, util.ErrCodeServerBusy)
 		return
 	}
-
 	if len(questionList) == 0 {
 		logger.LogDebug("questionList of this category is empty")
 		questionList = make([]*model.Question, 0)
 		util.ResponseSuccess(c, questionList)
 		return
 	}
+
 	// 获取问题的作者信息
 	var userIdList []int64
 	userIdMap := make(map[int64]bool, 20)
@@ -74,6 +75,8 @@ func GetQuestionListHandle(c *gin.Context) {
 	for _, question := range questionList {
 		var apiQuestion model.ApiQuestion
 		apiQuestion.Question = *question
+		apiQuestion.QuestionIdStr = fmt.Sprintf("%d", apiQuestion.QuestionId)
+		apiQuestion.AuthorIdStr = fmt.Sprintf("%d", apiQuestion.AuthorId)
 		apiQuestion.CreateTimeStr = question.CreateTime.Format(time.RFC822)
 		for _, userInfo := range userInfoList {
 			if question.AuthorId == userInfo.UserId {
@@ -83,5 +86,6 @@ func GetQuestionListHandle(c *gin.Context) {
 		}
 		apiQuestionList = append(apiQuestionList, apiQuestion)
 	}
+	logger.LogDebug("questionList = %#v", apiQuestionList[0])
 	util.ResponseSuccess(c, apiQuestionList)
 }

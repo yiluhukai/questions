@@ -11,6 +11,7 @@ const (
 	ErrCodeContentHit        = 1007
 	ErrCodeNotLogin          = 1008
 	ErrCodeRecordExist       = 1009
+	ErrCodeQuestionNotExist  = 10010
 )
 
 func GetMessage(code int) (message string) {
@@ -35,6 +36,8 @@ func GetMessage(code int) (message string) {
 		message = "用户未登录"
 	case ErrCodeRecordExist:
 		message = "记录已经存在"
+	case ErrCodeQuestionNotExist:
+		message = "问题不存在"
 	default:
 		message = "未知错误"
 	}
