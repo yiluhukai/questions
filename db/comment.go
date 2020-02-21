@@ -25,10 +25,28 @@ func CreatePostComment(comment *model.Comment) (err error) {
 		return
 	}
 	// 维护coment_rel表
-	sqlStr = "insert into comment_rel(comment_id,question_id,parent_id,level,reply_author_id) values(?,?,?,?,?)"
-	_, err = tx.Exec(sqlStr, comment.CommentId, comment.QuestionId, comment.ParentId, 1, comment.ReplyAuthorId)
+	sqlStr = `insert into comment_rel(comment_id,question_id,parent_id,level,reply_author_id,type) 
+				values(?,?,?,?,?,?)`
+	_, err = tx.Exec(sqlStr, comment.CommentId, comment.QuestionId, comment.ParentId, 1, comment.ReplyAuthorId, comment.Type)
 	if err != nil {
 		logger.LogError("insert into  comment_rel count failed, comment:%#v err:%v", comment, err)
+		_ = tx.Rollback()
+		return
+	}
+
+	//更新问题或者答案的评论数量
+	if comment.Type == model.CommentType {
+		//更新答案
+		sqlStr = "update  answer  set comment_count = comment_count + 1 where author_id =?"
+	} else {
+		//问题
+		sqlStr = "update  question  set comment_count = comment_count + 1 where question_id =?"
+	}
+
+	_, err = tx.Exec(sqlStr, comment.QuestionId)
+
+	if err != nil {
+		logger.LogError("update comment_count failde:%v", err)
 		_ = tx.Rollback()
 		return
 	}
@@ -86,7 +104,7 @@ func ReplyComment(replyComment *model.Comment) (err error) {
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 	sqlStr := "insert into comment(comment_id,content,author_id) values(?,?,?)"
@@ -94,7 +112,7 @@ func ReplyComment(replyComment *model.Comment) (err error) {
 
 	if err != nil {
 		logger.LogError("insert into comment failed:%v", err)
-		err = tx.Rollback()
+		_ = tx.Rollback()
 		return
 	}
 
@@ -105,7 +123,16 @@ func ReplyComment(replyComment *model.Comment) (err error) {
 
 	if err != nil {
 		logger.LogError("insert into comment_rel failed:%v", err)
-		err = tx.Rollback()
+		_ = tx.Rollback()
+		return
+	}
+	// 更新评论被评论的数量
+
+	sqlStr = "update comment set comment_count =comment_count + 1 where comment_id = ?"
+	_, err = tx.Exec(sqlStr, replyComment.ReplyCommentId)
+	if err != nil {
+		logger.LogError("update comment_count failed:%v", err)
+		_ = tx.Rollback()
 		return
 	}
 	err = tx.Commit()

@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	QuestionType = iota
+	CommentType
+)
+
 type Comment struct {
 	CommentId         int64     `json:"-" db:"comment_id" `
 	Content           string    `db:"content" json:"content"`
@@ -21,6 +26,7 @@ type Comment struct {
 	AuthorName        string    `json:"author_name"`
 	ReplyAuthorName   string    `json:"reply_author_name"`
 	CommentIdStr      string    `json:"comment_id"`
+	Type              int       `json:"type" db:"type"`
 }
 
 type ApiCommentList struct {
