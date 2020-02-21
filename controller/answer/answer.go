@@ -1,6 +1,7 @@
 package answer
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"html"
 	"logger"
@@ -70,6 +71,7 @@ func AnswerListHandle(c *gin.Context) {
 	for _, v := range answerList {
 		apiAnswer := &model.ApiAnswer{}
 		apiAnswer.Answer = *v
+		apiAnswer.Answer.AnswerIdStr = fmt.Sprintf("%v", v.AnswerId)
 
 		for _, user := range userInfoList {
 			if user.UserId == v.AuthorId {

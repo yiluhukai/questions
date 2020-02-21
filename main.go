@@ -39,8 +39,8 @@ func main() {
 		panic(err)
 	}
 	// 初始化Session
-	//err = session.Init("redis", "192.168.1.12:6379")
-	err = session.Init("memory", "")
+	err = session.Init("redis", "127.0.0.1:6379")
+	//err = session.Init("memory", "")
 	if err != nil {
 		fmt.Printf("init redis error:%v", err)
 		panic(err)
@@ -58,8 +58,11 @@ func main() {
 	router.GET("/api/question/detail", question.QuestionDetailHandle)
 	router.GET("/api/answer/list", answer.AnswerListHandle)
 	router.POST("/api/answer/commit", auth_middleware.AuthMiddleWare, answer.AnswerCommitHandle)
-	group := router.Group("/api/comment", auth_middleware.AuthMiddleWare)
+	commentGroup := router.Group("/api/comment", auth_middleware.AuthMiddleWare)
 
-	group.POST("/post_comment", comment.PostCommentHandle)
+	commentGroup.POST("/post_comment", comment.PostCommentHandle)
+	commentGroup.GET("/list", comment.CommentListHandle)
+	commentGroup.POST("/reply_comment", comment.ReplyCommentHandle)
+	commentGroup.GET("/reply_list", comment.CommentReplyListHandle)
 	_ = router.Run(":9090")
 }

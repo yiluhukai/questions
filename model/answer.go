@@ -5,7 +5,7 @@ import (
 )
 
 type Answer struct {
-	AnswerId     int64     `json:"answer_id" db:"answer_id"`
+	AnswerId     int64     `json:"-" db:"answer_id"`
 	Content      string    `json:"content" db:"content"`
 	CommentCount int32     `json:"comment_count" db:"comment_count"`
 	VoteupCount  int32     `json:"voteup_count" db:"voteup_count"`
@@ -15,6 +15,7 @@ type Answer struct {
 	CreateTime   time.Time `json:"create_time" db:"create_time"`
 	UpdateTime   time.Time `json:"update_time" db:"update_time"`
 	QuestionId   string    `json:"question_id"`
+	AnswerIdStr  string    `json:"answer_id"`
 }
 
 type ApiAnswer struct {
