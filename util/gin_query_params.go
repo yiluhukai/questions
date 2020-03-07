@@ -3,8 +3,8 @@ package util
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"logger"
 	"strconv"
+	"yiluhuakai/logger"
 )
 
 // 将参数中的字符串转成整形

@@ -2,11 +2,11 @@ package account
 
 import (
 	"fmt"
-	"questions/db"
-	"questions/gen_id"
-	"questions/middleware/account"
-	"questions/model"
-	"questions/util"
+	"yiluhuakai/questions/db"
+	"yiluhuakai/questions/gen_id"
+	"yiluhuakai/questions/middleware/account"
+	"yiluhuakai/questions/model"
+	"yiluhuakai/questions/util"
 
 	"github.com/gin-gonic/gin"
 )

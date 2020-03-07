@@ -2,8 +2,8 @@ package db
 
 import (
 	"github.com/jmoiron/sqlx"
-	"logger"
-	"questions/model"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/model"
 )
 
 func GetCategoryList() (categoryList []*model.Category, err error) {

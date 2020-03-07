@@ -2,8 +2,8 @@ package db
 
 import (
 	"github.com/jmoiron/sqlx"
-	"logger"
-	"questions/model"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/model"
 )
 
 func GetAnswerIdList(qid int64, offset int64, limit int64) (answerIdList []int64, err error) {
@@ -84,6 +84,51 @@ func CreateAnswer(answer *model.Answer, questionId int64) (err error) {
 
 	if err != nil {
 		logger.LogError("insert into question_answer_rel failed:%v", err)
+		_ = tx.Rollback()
+		return
+	}
+	err = tx.Commit()
+	return
+}
+
+// 更新count
+
+func UpdateAnswerLike(like *model.Like, isInCreasement bool) (err error) {
+	tx, err := db.Beginx()
+	if err != nil {
+		logger.LogError("start tx failed :%v", err)
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+	}()
+	var sqlStr string
+	if isInCreasement {
+		sqlStr = "update answer set voteup_count  =  voteup_count +1  where  answer_id =?"
+	} else {
+		sqlStr = "update answer set voteup_count  = voteup_count -1  where  answer_id =?"
+	}
+	_, err = tx.Exec(sqlStr, like.Id)
+
+	if err != nil {
+		logger.LogError("update comment' comment_count failed:%v", err)
+		_ = tx.Rollback()
+		return
+	}
+
+	// 维护关系表
+	if isInCreasement {
+		sqlStr = "insert into like_owner_rel(type,like_id,user_id)  values(?,?,?)"
+
+	} else {
+		sqlStr = "delete from like_owner_rel where type=? and like_id  = ? and  user_id = ?"
+	}
+	_, err = tx.Exec(sqlStr, 0, like.Id, like.UserId)
+	if err != nil {
+		logger.LogDebug("insert into like_owner_rel failed:%v", err)
 		_ = tx.Rollback()
 		return
 	}

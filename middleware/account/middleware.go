@@ -2,7 +2,7 @@ package account
 
 import (
 	"github.com/gin-gonic/gin"
-	"questions/util"
+	"yiluhuakai/questions/util"
 )
 
 func AuthMiddleWare(c *gin.Context) {

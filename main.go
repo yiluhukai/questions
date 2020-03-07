@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"logger"
-	"questions/controller/account"
-	"questions/controller/answer"
-	"questions/controller/category"
-	"questions/controller/comment"
-	"questions/controller/question"
-	"questions/db"
-	"questions/filter"
-	"questions/gen_id"
-	auth_middleware "questions/middleware/account"
-	"questions/session"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/controller/account"
+	"yiluhuakai/questions/controller/answer"
+	"yiluhuakai/questions/controller/category"
+	"yiluhuakai/questions/controller/comment"
+	"yiluhuakai/questions/controller/question"
+	"yiluhuakai/questions/db"
+	"yiluhuakai/questions/filter"
+	"yiluhuakai/questions/gen_id"
+	auth_middleware "yiluhuakai/questions/middleware/account"
+	"yiluhuakai/questions/session"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,5 +64,6 @@ func main() {
 	commentGroup.GET("/list", comment.CommentListHandle)
 	commentGroup.POST("/reply_comment", comment.ReplyCommentHandle)
 	commentGroup.GET("/reply_list", comment.CommentReplyListHandle)
+	commentGroup.POST("like", comment.LikeHandle)
 	_ = router.Run(":9090")
 }

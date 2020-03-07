@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"logger"
-	"questions/model"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/model"
 )
 
 func CreateQuestion(question *model.Question) (err error) {

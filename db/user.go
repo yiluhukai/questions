@@ -2,11 +2,11 @@ package db
 
 import (
 	"database/sql"
-	"logger"
+	"yiluhuakai/logger"
 
 	"github.com/jmoiron/sqlx"
-	"questions/model"
-	"questions/util"
+	"yiluhuakai/questions/model"
+	"yiluhuakai/questions/util"
 )
 
 const (

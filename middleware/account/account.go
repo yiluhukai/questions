@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 
-	"questions/session"
+	"yiluhuakai/questions/session"
 )
 
 //check user status,if login set session,userid,userstatus,or ceated a session

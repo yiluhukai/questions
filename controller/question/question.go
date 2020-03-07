@@ -1,13 +1,13 @@
 package question
 
 import (
-	"logger"
-	"questions/db"
-	"questions/filter"
-	"questions/gen_id"
-	"questions/middleware/account"
-	"questions/model"
-	"questions/util"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/db"
+	"yiluhuakai/questions/filter"
+	"yiluhuakai/questions/gen_id"
+	"yiluhuakai/questions/middleware/account"
+	"yiluhuakai/questions/model"
+	"yiluhuakai/questions/util"
 
 	"github.com/gin-gonic/gin"
 )

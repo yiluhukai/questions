@@ -3,13 +3,13 @@ package comment
 import (
 	"fmt"
 	"html"
-	"logger"
-	"questions/db"
-	"questions/gen_id"
-	"questions/middleware/account"
-	"questions/model"
-	"questions/util"
 	"strconv"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/db"
+	"yiluhuakai/questions/gen_id"
+	"yiluhuakai/questions/middleware/account"
+	"yiluhuakai/questions/model"
+	"yiluhuakai/questions/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -230,4 +230,42 @@ func CommentReplyListHandle(c *gin.Context) {
 	commentApiList.Count = count
 
 	util.ResponseSuccess(c, commentApiList)
+}
+
+// 添加点赞
+func LikeHandle(c *gin.Context) {
+	var like model.Like
+
+	err := c.BindJSON(&like)
+
+	if err != nil {
+		logger.LogError("bind paramters failed :%v", err)
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+	//将id有字符串转成int64
+	like.Id, err = strconv.ParseInt(like.IdStr, 10, 64)
+
+	if err != nil {
+		logger.LogError("parseInt from string failed :%v", err)
+		util.ResponseError(c, util.ErrCodeParameter)
+		return
+	}
+	like.UserId, err = account.GetUserId(c)
+
+	if err != nil {
+		logger.LogError("user doesn't login :%v", err)
+		util.ResponseError(c, util.ErrCodeQuestionNotExist)
+		return
+	}
+
+	err = db.AddOrCancelLike(&like)
+
+	if err != nil {
+		logger.LogError("add or cancel like failed %v", err)
+		util.ResponseError(c, util.ErrCodeServerBusy)
+		return
+	}
+	util.ResponseSuccess(c, nil)
+	return
 }

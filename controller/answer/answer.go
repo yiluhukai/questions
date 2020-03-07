@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"html"
-	"logger"
-	"questions/db"
-	"questions/gen_id"
-	"questions/middleware/account"
-	"questions/model"
-	"questions/util"
 	"strconv"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/db"
+	"yiluhuakai/questions/gen_id"
+	"yiluhuakai/questions/middleware/account"
+	"yiluhuakai/questions/model"
+	"yiluhuakai/questions/util"
 )
 
 func AnswerListHandle(c *gin.Context) {

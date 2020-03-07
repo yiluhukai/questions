@@ -1,9 +1,10 @@
 package db
 
 import (
+	"database/sql"
 	"github.com/jmoiron/sqlx"
-	"logger"
-	"questions/model"
+	"yiluhuakai/logger"
+	"yiluhuakai/questions/model"
 )
 
 func CreatePostComment(comment *model.Comment) (err error) {
@@ -175,5 +176,80 @@ func GetReplyCommentList(parentId, offset, limit int64) (replyComments []*model.
 		logger.LogDebug("get comment count failed:%v", err)
 		return
 	}
+	return
+}
+
+// 点赞
+
+func AddOrCancelLike(like *model.Like) (err error) {
+	var id int
+	sqlStr := "select id from like_owner_rel where like_id =? and user_id =?"
+	err = db.Get(&id, sqlStr, like.Id, like.UserId)
+
+	if err != nil && err != sql.ErrNoRows {
+		logger.LogError("query like record failed:%v", err)
+		return
+	}
+	if err == sql.ErrNoRows {
+		logger.LogDebug("doesn't add like for this answer or comment")
+
+		//判断是对答案还是对评论的点赞
+		if like.Type == model.AnswerTypeForLIke {
+			err = UpdateAnswerLike(like, true)
+		} else {
+			err = UpdateCommentLike(like, true)
+		}
+		return
+	}
+
+	//记录存在，取消点赞
+	if like.Type == model.AnswerTypeForLIke {
+		err = UpdateAnswerLike(like, false)
+	} else {
+		err = UpdateCommentLike(like, false)
+	}
+	return
+}
+
+func UpdateCommentLike(like *model.Like, isInCreasement bool) (err error) {
+	tx, err := db.Beginx()
+	if err != nil {
+		logger.LogError("start tx failed :%v", err)
+		return
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+	}()
+	var sqlStr string
+	if isInCreasement {
+		sqlStr = "update comment set comment_count  =  comment_count +1  where  comment_id =?"
+	} else {
+		sqlStr = "update comment set comment_count  =  comment_count -1  where  comment_id =?"
+	}
+	_, err = tx.Exec(sqlStr, like.Id)
+
+	if err != nil {
+		logger.LogError("update comment' comment_count failed:%v", err)
+		_ = tx.Rollback()
+		return
+	}
+
+	// 维护关系表
+	if isInCreasement {
+		sqlStr = "insert into like_owner_rel(type,like_id,user_id)  values(?,?,?)"
+
+	} else {
+		sqlStr = "delete from like_owner_rel where type=? and like_id  = ? and  user_id = ?"
+	}
+	_, err = tx.Exec(sqlStr, 0, like.Id, like.UserId)
+	if err != nil {
+		logger.LogDebug("insert into like_owner_rel failed:%v", err)
+		_ = tx.Rollback()
+		return
+	}
+	err = tx.Commit()
 	return
 }
